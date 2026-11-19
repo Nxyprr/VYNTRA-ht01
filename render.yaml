@@ -1,11 +1,13 @@
+
 # Blueprint de Render: base de datos + API + sitio web (frontend), todo en Render.
 databases:
   - name: vyntra-db
     plan: free
     databaseName: vyntra
     user: vyntra
+
 services:
-    - type: web
+  - type: web
     name: vyntra-api
     runtime: python
     plan: free
@@ -28,6 +30,7 @@ services:
         sync: false
       - key: INS_PASSWORD
         sync: false
+
   - type: web
     name: vyntra-web
     runtime: static
