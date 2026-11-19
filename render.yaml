@@ -5,9 +5,10 @@ databases:
     databaseName: vyntra
     user: vyntra
 services:
-  - type: web
+    - type: web
     name: vyntra-api
     runtime: python
+    plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
@@ -43,4 +44,4 @@ services:
       - key: VITE_API_URL
         value: https://vyntra-api.onrender.com
       - key: VITE_DEMO_LOGIN
-        value: "true"
+        value: "false"
