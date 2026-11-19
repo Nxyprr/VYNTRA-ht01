@@ -69,14 +69,35 @@ UNITS = [("Inteligencia Artificial", "Campo que desarrolla sistemas capaces de r
 def boot():
     Base.metadata.create_all(dbe)
     with Session() as s:
-        if not s.query(User).count():
-            for u, p, r in [("estudiante", os.getenv("EST_PASSWORD", "Est2026!"), "Estudiante"), ("instructor", os.getenv("INS_PASSWORD", "Ins2026!"), "Instructor"), ("admin", os.getenv("ADMIN_PASSWORD", "Adm2026!"), "Administrador")]:
-                s.add(User(username=u, password_hash=hash_pw(p), role=r, active=True))
-            s.commit()
+        # Crear o actualizar las cuentas demo sin borrar otros usuarios ni datos.
+        cuentas_demo = [
+            ("estudiante", os.getenv("EST_PASSWORD", "Est2026!"), "Estudiante"),
+            ("instructor", os.getenv("INS_PASSWORD", "Ins2026!"), "Instructor"),
+            ("admin", os.getenv("ADMIN_PASSWORD", "Adm2026!"), "Administrador"),
+        ]
+
+        for username, password, role in cuentas_demo:
+            usuario = s.query(User).filter_by(username=username).first()
+            if usuario:
+                usuario.password_hash = hash_pw(password)
+                usuario.role = role
+                usuario.active = True
+            else:
+                s.add(User(
+                    username=username,
+                    password_hash=hash_pw(password),
+                    role=role,
+                    active=True
+                ))
+        s.commit()
+
         if not s.query(Dataset).count():
-            for n, df in synth(): add_ds(s, df, n, "sintetico", None)
+            for n, df in synth():
+                add_ds(s, df, n, "sintetico", None)
+
         if not s.query(Unit).count():
-            for t, b, q, o, a in UNITS: s.add(Unit(title=t, body=b, question=q, options=o, answer=a))
+            for t, b, q, o, a in UNITS:
+                s.add(Unit(title=t, body=b, question=q, options=o, answer=a))
             s.commit()
 class Login(BaseModel): username: str; password: str
 @app.post("/auth/login")
